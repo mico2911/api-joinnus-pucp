@@ -1,0 +1,105 @@
+<%- include('../../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/store/compras.css">
+    <link rel="stylesheet" href="/css/store/home.css">
+    <link rel="stylesheet" href="/css/store/general.css">
+</head>
+<body class="compra-body">
+    <%- include('../../includes/headerStore.ejs') %>
+
+    <main class="detalle-compra-wrapper">
+        <div class="header-btns bg-jnns-white mb-80">
+            <%- include('./headerButtons', {idEvento: evento._id, idCompra: compra._id}) %>
+        </div>
+
+        <div class="container">
+            <div style="position: relative;">
+                <div class="circle -top-circle"></div>
+
+                <div class="resume-detail">
+                    <div class="title"> Resumen de compra </div>
+                    
+                    <div class="detail-payment">
+                        <div class="detail-event">
+                            <div>
+                                <img src="<%= evento.urlImagen %>" alt="evento" class="img-event">
+                            </div>
+                            <div>
+                                <div class="title-event">
+                                    <%= evento.nombre %>
+                                </div>
+                                <div class="text-secondary-800">
+                                    <strong>Fecha y hora del evento:</strong>
+                                    <%= evento.fecha %> | <%= evento.hora %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid-cols-2 padding-top-bottom-20">
+                            <div class="space-y-0-5">
+                                <div class="text-secondary-800">
+                                    <strong>Fecha de compra:</strong> 9 de noviembre de 2024
+                                </div>
+                                <div class="text-secondary-800">
+                                    <strong>Nº Transacción:</strong> <%= evento._id %>                                    
+                                </div>
+                            </div>
+                            <div class="space-y-0-5">
+                                <div class="text-secondary-800">
+                                    <strong>Hora de compra:</strong> 09:37 p.m.
+                                </div>
+                                <div class="text-secondary-800">
+                                    <strong>Token:</strong> -
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="line-division">
+
+                        <div class="detail-buys">
+                            <div class="subtitle-summary"> Datos de la compra: </div>
+
+                            <div class="padding-top-bottom-20"> 
+                                <% for (let entrada of compra.entradas) { %>
+                                    <%- include('./resumen-entrada', {entrada: entrada}) %>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <hr class="line-division">
+
+                        <div class="data-payment">
+                            <div class="subtitle-summary"> Datos del pago: </div>
+
+                            <div class="padding-top-bottom-20"> 
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-left text-nowrap">
+                                        Entradas
+                                    </div>
+
+                                    <div class="text-right text-nowrap">
+                                        S/<%= compra.total %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="padding-top-bottom-20 pb-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="subtitle-summary text-left text-nowrap">
+                                        Total
+                                    </div>
+
+                                    <div class="subtitle-summary text-right text-nowrap">
+                                        S/<%= compra.total %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="circle -bottom-circle"></div>
+            </div>    
+            <div class="pb-50 pt-50"></div>
+        </div>        
+    </main>
+</body>
+</html>

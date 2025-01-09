@@ -1,0 +1,95 @@
+<%- include('../../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/sidebar.css">    
+    <link rel="stylesheet" href="/css/backoffice/backoffice.css">
+</head>
+<body class="backoffice-body">
+    <%- include('../../includes/header.ejs') %>
+
+    <main class="backoffice-main d-flex">
+        <div class="left-section">
+            <div class="user-section">
+                Usuario Administrador
+            </div>
+            <div class="sidebar-section">
+                <%- include('../../includes/sidebarBackOffice.ejs') %>
+            </div>
+        </div>
+        <div class="right-section w-100">
+            <div class="content-wrapper">
+                <h1 class="title-section"><%= tituloSeccion %></h1>
+
+                <form class="evento-form" action="/backoffice/<% if (modoEdicion) { %>editar-evento<% } else { %>creacion-evento<% } %>" method="POST">
+
+                    <% if (modoEdicion) { %>
+                        <input type="hidden" value="<%= evento._id %>" name="idEvento">
+                    <% } %>
+
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" name="nombre" id="nombre" value="<% if (modoEdicion) { %><%= evento.nombre %><% } %>">
+                        </div>
+
+                        <div class="col-6">
+                            <label for="categoria">Categoría</label>
+                            <%- include('../../includes/opcionesCategorias.ejs', {categorias: categorias}) %>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" name="fecha" id="fecha" value="<% if (modoEdicion) { %><%= fechaEvento %><% } %>">
+                        </div>
+
+                        <div class="col-6">
+                            <label for="hora">Hora</label>
+                            <%- include('../../includes/opcionesHoras.ejs') %>
+                        </div>
+                    </div>
+
+
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="lugar">Lugar</label>
+                            <input type="text" name="lugar" id="lugar" value="<% if (modoEdicion) { %><%= evento.lugar %><% } %>">
+                        </div>
+
+                        <div class="col-6">
+                            <label for="ciudad">Ciudad</label>
+                            <select name="ciudad" id="ciudad">
+                                <% if (modoEdicion) { %>
+                                    <% for (let ciudad of citiesOptions) { %>
+                                        <option value="<%= ciudad.id %>" <%= ciudad.id == evento.ciudad ? 'selected' : '' %>><%= ciudad.nombre %></option>
+                                    <% } %>
+                                <% } else { %>
+                                    <% for (let ciudad of citiesOptions) { %>
+                                        <option value="<%= ciudad.id %>"><%= ciudad.nombre %></option>       
+                                    <% } %>
+                                <% } %>    
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="urlImagen">Url Imagen</label>
+                            <input type="text" name="urlImagen" id="urlImagen" value="<% if (modoEdicion) { %><%= evento.urlImagen %><% } %>">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="descripcion">Descripcion</label>
+                            <input type="text" name="descripcion" id="descripcion" value="<% if (modoEdicion) { %><%= evento.descripcion %><% } %>">
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="btn btn-primary" type="submit"><% if (modoEdicion) { %>Actualizar Evento<% } else { %>Crear Evento<% } %></button>
+                </form>                
+            </div>            
+        </div>
+    </main>
+</body>
+</html>

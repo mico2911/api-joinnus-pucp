@@ -1,0 +1,56 @@
+.auth-image {
+    background-image: url(https://s3-us-west-2.amazonaws.com/joinnus.com/files/login-image-g.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
+a {
+    color: #42a692;
+    text-decoration: none;
+    background-color: transparent;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+input, select {
+    height: 38px;
+    background-color: #f1f6f5;
+    border: 1px solid #CED4DA;
+    display: block;
+    width: 100%;
+    color: #495057;
+    padding: 0 15px;
+}
+
+.btn-auth {
+    color: #fff;
+    background-color: #42a692;
+    border-color: #42a692;
+}
+
+.btn-auth:hover {
+    color: #fff;
+    background-color: #378b7a;
+    border-color: #338272;
+}
+
+.user-message {
+    margin: auto;
+    width: 90%;
+    border: 1px solid #4771fa;
+    padding: 0.5rem;
+    border-radius: 3px;
+    background: #b9c9ff;
+    text-align: center;
+}
+  
+.user-message-error {
+    border-color: red;
+    background: rgb(255, 176, 176);
+    color: red;
+}

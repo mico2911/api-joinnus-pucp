@@ -1,0 +1,61 @@
+<%- include('../../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/sidebar.css">    
+    <link rel="stylesheet" href="/css/backoffice/backoffice.css">
+</head>
+<body class="backoffice-body">
+    <%- include('../../includes/header.ejs') %>
+
+    <main class="backoffice-main d-flex">
+        <div class="left-section">
+            <div class="user-section">
+                Usuario Administrador
+            </div>
+            <div class="sidebar-section">
+                <%- include('../../includes/sidebarBackOffice.ejs') %>
+            </div>
+        </div>
+        <div class="right-section">
+            <div class="content-wrapper">
+                <h1 class="title-section"><%= tituloSeccion %></h1>
+
+                <form class="entrada-form" action="/backoffice/creacion-entrada" method="POST">
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="evento">Evento</label>
+                            <select name="idEvento" id="idEvento">
+                                <% for (let evento of eventos) { %>
+                                    <option value="<%= evento._id %>"><%= evento.nombre %></option>       
+                                <% } %>                                
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="evento">Tipo Entrada</label>
+                            <select name="idTipoEntrada" id="idTipoEntrada">
+                                <% for (let te of tiposEntradas) { %>
+                                    <option value="<%= te._id %>"><%= te.nombre %></option>       
+                                <% } %>                                
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="precio">Precio</label>
+                            <input type="number" name="precio" id="precio" >
+                        </div>
+
+                        <div class="col-6">
+                            <label for="cantidad">Cantidad entradas a vender</label>
+                            <input type="number" name="cantidad" id="cantidad" >
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="btn btn-primary" type="submit">Crear Entrada</button>
+                </form>
+            </div>            
+        </div>
+    </main>
+</body>
+</html>

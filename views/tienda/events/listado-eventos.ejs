@@ -1,0 +1,113 @@
+<%- include('../../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/store/general.css">
+    <link rel="stylesheet" href="/css/store/home.css">
+    <link rel="stylesheet" href="/css/store/plp.css">
+</head>
+<body class="joinnus-body">
+    <%- include('../../includes/headerStore.ejs') %>
+
+    <main>
+        <div class="container-section">
+            <div class="principal-events d-flex p-0 mt-4">
+                <div class="col-2 p-0">
+                    <h3> Filtros </h3>
+
+                    <form action="/tienda/buscar-eventos" class="search-form mb-2" method="GET">
+                        <div class="form-row">
+                            <label for="categoria">Categoría</label>
+
+                            <div class="col-10 p-0">
+                                <select name="idCategoria" id="idCategoria">
+                                    <option value="">Seleccione</option>
+
+                                    <% for (let cat of categorias) { %>
+                                        <option value="<%= cat._id %>" <%= cat._id.equals(categoriaSeleccionada) ? 'selected' : '' %>><%= cat.nombre %></option>
+                                    <% } %>
+                                </select>
+                            </div> 
+                        </div>
+
+                        <div class="form-row">
+                            <label for="categoria">Ciudad</label>
+
+                            <div class="col-10 p-0">
+                                <select name="ciudad" id="ciudad">
+                                    <option value="">Seleccione</option>
+
+                                    <% for (let ciudad of citiesOptions) { %>
+                                        <option value="<%= ciudad.id %>" <%= ciudad.id == ciudadSeleccionada ? 'selected' : '' %>><%= ciudad.nombre %></option>       
+                                    <% } %>                                    
+                                </select>
+                            </div> 
+                        </div>
+
+
+                        <div class="form-row">
+                            <label for="precio">Fecha</label>
+                            
+                            <div class="col-10 p-0 mb-1">
+                                <input type="date" name="dateStart" value="<%= fechaInicioSeleccionada %>">
+                            </div> 
+
+                            <div class="col-10 p-0">
+                                <input type="date" name="dateEnd" value="<%= fechaFinSeleccionada %>">
+                            </div>
+                        </div>                    
+
+                        <div class="form-row">
+                            <button class="principal-btn">Aplicar filtros</button>
+                        </div>
+                    </form>
+
+                    <a href="/tienda/buscar-eventos" class="text-danger">Eliminar filtro</a>
+                </div>
+                <div class="col-10 p-0">                    
+                    <% if (eventos.length > 0) { %>
+                        <h1 class="subtitle-home"> Eventos </h1>
+                        <section class="pagination justify-content-end">                        
+                            <% if (paginaActual !== 1 && paginaAnterior !== 1) { %>
+                                <a class="btn ml-3" href="<%= direccionActual %>&pagina=1">1</a>
+                            <% } %>
+                            <% if (tienePaginaAnterior) { %>
+                                <a class="btn ml-3" href="<%= direccionActual %>&pagina=<%= paginaAnterior %>"><%= paginaAnterior %></a>
+                            <% } %>
+                            <a class="btn ml-3 active" href="<%= direccionActual %>&pagina=<%= paginaActual %>"><%= paginaActual %></a>
+                            <% if (tienePaginaSiguiente) { %>
+                                <a class="btn ml-3" href="<%= direccionActual %>&pagina=<%= paginaSiguiente %>"><%= paginaSiguiente %></a>
+                            <% } %>
+                            <% if (ultimaPagina !== paginaActual && paginaSiguiente !== ultimaPagina) { %>
+                                <a class="btn ml-3" href="<%= direccionActual %>&pagina=<%= ultimaPagina %>"><%= ultimaPagina %></a>
+                            <% } %>
+                        </section>
+                        <div class="eventos-destacados">
+                            <% for (let evento of eventos) { %>
+                                <div class="evento">
+                                    <img src="<%=evento.urlImagen %>" alt="Evento">
+                                    <div class="info-evento">
+                                        <h3 class="title-event"><%= evento.nombre %></h3>
+    
+                                        <div class="time-info">
+                                            <div class="icon-calendar">
+                                                <%- include('../../svgs/calendar.ejs') %>
+                                            </div>
+                                            
+                                            <p class="m-0" style="font-size: 12px;"> <%= evento.fecha %> - <%= evento.hora %> </p>
+                                        </div>
+                                        
+                                        <div class="price-info d-flex">                                    
+                                            <a href="/tienda/detalle-evento/<%= evento._id %>" class="btn-comprar"> Comprar </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <h1 class="subtitle-home"> Sin resultados </h1>
+                        <div>Para obtener más resultados, intenta ajustar tu búsqueda, modificando los filtros.</div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

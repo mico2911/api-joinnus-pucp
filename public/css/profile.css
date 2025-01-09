@@ -1,0 +1,36 @@
+.events-wishlisted-wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 15px;
+}
+
+.event-wishlisted-card {
+    border: 1px solid #00E0B1;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+
+    .info-event {
+        display: flex;
+        gap: 20px;
+
+        img {
+            height: 150px;
+            border-radius: 20px;
+        }
+    
+        .name-event {
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+}
+
+.compra-detail {
+    .btn-primary {
+        color: #fff;
+        background-color: #42a692;
+        border-color: #42a692;
+    }
+}

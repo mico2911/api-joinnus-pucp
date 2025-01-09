@@ -1,0 +1,18 @@
+.sidebar-item {
+    height: 40px;
+    background-color: #F8F9FA;
+    padding: 0 15px;
+
+    a {
+        color: #000;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    &.active {
+        background-color: #CCF9EF;
+        border-right: 8px solid #00E0B1;
+    }
+}

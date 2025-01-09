@@ -1,0 +1,229 @@
+.compra-body {
+    background-color: #FFF;
+}
+
+.detalle-compra-wrapper {
+    background-color: #E4EDF5;
+    min-height: calc(100vh - 58px);
+    color: #031425;
+    font-family: Poppins;
+}
+
+.container {
+    max-width: 1140px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.mb-80 {
+    margin-bottom: 80px;
+}
+
+.pt-50 {
+    padding-top: 50px;
+}
+.pb-50 {
+    padding-bottom: 50px;
+}
+
+.header-btns {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    padding: 10px 0px;
+}
+
+.btn-single {
+    color: #031425;
+    width: 170px;
+    height: 40px;
+    font-weight: 600;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-jnns-white {
+    background-color: #F2F6FA;
+}
+
+.circle {
+    background: radial-gradient(ellipse at center, #E4EDF5 0%, #E4EDF5 40%, transparent 30%);
+    background-size: 6rem 6rem;
+    height: 6rem;
+    background-repeat: repeat-x;
+    background-position: 3rem center;
+    width: 100%;
+    position: absolute;
+    z-index: 1;
+}
+
+.-top-circle {
+    top: -3rem;
+}
+
+.-bottom-circle {
+    bottom: -3rem;
+}
+
+.resume-detail {
+    background-color: #FFF;
+    padding: 60px 32px;
+
+    .title {
+        font-weight: 800;
+        line-height: 51px;
+        text-align: center;
+        font-size: 34px;
+        padding: 8px 0px 24px 0px;
+        margin-bottom: 24px;
+    }
+}
+
+.detail-event {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+
+    .img-event {
+        height: 96px;
+        width: 168px;
+        border-radius: 8px;
+    }
+
+    .title-event {
+        font-weight: 700;
+        line-height: 36px;
+        font-size: 24px;
+        color: #00B38E;
+        text-align: start;
+    }   
+}
+
+.grid-cols-2 {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.padding-top-bottom-20 {
+    padding: 20px 0px 20px 0px;
+}
+
+.line-division {
+    border: 0;
+    border-top: 2px solid #C9DAEC;
+    margin: 10px 0 30px 0;
+}
+
+.subtitle-summary {
+    font-weight: 900;
+    font-size: 24px;
+    line-height: 36px;
+    color: #031425;
+}
+
+.resumen-entrada-wrapper {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 3fr 7fr 2fr;
+}
+
+.ticket,
+.data-payment {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 24px;            
+}
+
+.name {
+    font-weight: 500;
+}
+
+.header-entrada {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .title {
+        font-weight: 800;
+        line-height: 51px;
+        text-align: center;
+        font-size: 34px;        
+    }
+
+    .btn-accept {
+        background-color: #42A692;
+        color: #FFF;
+        font-weight: 500;
+        border: 0;
+        height: 34px;
+        padding: 6px 30px;
+        border-radius: 50px;
+    }
+}
+
+.entradas-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.entrada-details {
+    display: flex;
+    padding: 10px;
+}
+
+.entrada-wrapper {
+    background-color: #FFF;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    padding: 15px 10px;    
+
+    .left-entrada{ 
+        display: flex;
+        flex-flow: column;
+        gap: 20px;
+        padding: 10px 30px;
+        border-right: 4px solid #E4EDF5;
+
+        .logo {
+            width: 113px;
+            height: 32px;
+        }
+    
+        .qrcode {
+            width: 147px;
+            height: 153px;
+        }
+
+        .left-event-name{
+            width: 147px;
+        }
+    }
+    
+    .right-entrada {
+        padding: 10px 30px;
+        width: 100%;
+
+        .right-event-name {
+            font-size: 30px;
+            border: 8px solid #000;
+            border-left: 0;
+            border-right: 0;
+            padding: 10px 0;
+        }
+
+        .entrada-data {
+            font-weight: 600;
+            border-bottom: 2px solid #000;
+        }
+    }
+}

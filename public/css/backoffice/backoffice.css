@@ -1,0 +1,109 @@
+.header-profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    background-color: #1A171B;
+    padding: 0 18px;
+}
+
+.backoffice-main {
+    min-height: calc(100vh - 58px);
+
+    .left-section {
+        width: 260px;
+        background-color: #F8F9FA;        
+
+        .user-section {
+            height: 98px;
+            background-color: #E4EDF5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+    }
+
+    .right-section {
+        width: calc(100vw - 260px);
+    }
+
+    .content-wrapper {
+        padding: 32px;
+
+        .title-section {
+            font-weight: 700;
+            margin-bottom: 36px;            
+        }
+
+        .subtitle-section {
+            font-size: 20px;
+            line-height: 28px;
+            font-weight: 900;
+        }
+        
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input, select {
+            height: 38px;
+            background-color: #E9ECEF;
+            border: 1px solid #CED4DA;
+            display: block;
+            width: 100%;
+            color: #495057;
+            padding: 0 15px;
+        }
+    }
+
+    .backoffice-table {
+        th, td {
+            border-bottom: 2px solid #FFF;
+            font-weight: 500;
+        }
+
+        th {
+            background-color: #42A692;
+            color: #FFF;
+        }
+
+        td {
+            background-color: #F1F6F5;
+            text-transform: uppercase;
+        }
+
+        .options-row {
+            display: flex;
+        }
+        
+    }
+
+    .form-crear-categoria {
+        gap: 0 !important;
+    }
+
+    .detalle-entrada-wrapper {
+        width: 600px;
+    }
+}
+
+.user-message {
+    margin: auto;
+    width: 90%;
+    border: 1px solid #4771fa;
+    padding: 0.5rem;
+    border-radius: 3px;
+    background: #b9c9ff;
+    text-align: center;
+}
+  
+.user-message-error {
+    border-color: red;
+    background: rgb(255, 176, 176);
+    color: red;
+}

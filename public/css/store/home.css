@@ -1,0 +1,127 @@
+.header-store {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    background-color: #1A171B;
+    padding: 0 18px;
+
+    .header-store-btn {
+        border-radius: 50px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        font-weight: 400;
+        padding: 6px 24px;
+    }
+
+    .login-btn {
+        color: #fff;
+        background-color: #42a692;
+        border: 1px solid #42a692;
+    }
+
+    .register-btn {
+        color: #fff;
+        border: 2px solid #42a692;
+    }
+}
+
+.principal-banner {
+    img {
+        width: 100%;
+    }
+}
+
+.container-section {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.filter-section,
+.search-section,
+.principal-events {
+    padding-left: 15px;
+    padding-right: 15px;
+
+    @media (min-width: 1360px) {        
+        max-width: 1300px;
+    }
+    
+    .subtitle-home {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: #1A171B;
+    }
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+
+    .btn-search {
+        color: #fff;
+        background-color: #42a692;
+        border: 1px solid #42a692;
+    }
+}
+
+.eventos-destacados {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.evento {
+    border-radius: 10px;
+    height: 360px;
+}
+
+.evento:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.20);
+}
+
+.info-evento {
+    padding: 15px;
+    line-height: 0.5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.title-event {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    height: 42px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.evento img {
+    border-radius: 10px 10px 0 0;
+    height: 184px;
+    width: 100%;
+}
+
+.time-info {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 15px;
+    background-color: #F1F6F5;
+    padding: 4px 16px;
+}
+
+.info-evento .btn-comprar {
+    text-decoration: none;
+    border: none;
+    background: none;
+    background-color: #42a692;
+    color: #fff;
+    padding: 15px 10px;
+    cursor: pointer;
+    border-radius: 10px;
+}

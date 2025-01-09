@@ -1,0 +1,86 @@
+<%- include('../../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/store/home.css">
+    <link rel="stylesheet" href="/css/store/general.css">
+    <link rel="stylesheet" href="/css/store/pdp.css">
+</head>
+<body>
+    <%- include('../../includes/headerStore.ejs') %>
+    <main class="row centered pdp-wrapper">
+        <div class="col-12 col-md-6 col-lg-7 pdp-left">
+            <div class="mb-3">
+                <img class="w-100" src="<%= evento.urlImagen %>" alt="<%= evento.imagen %>">
+            </div>
+
+            <div class="evento-name-section">
+                <h1><%= evento.nombre %></h1>
+
+                <% if (autenticado && !isAdmiUser) { %>
+                    <div class="wishlist-icon">
+                        <form action="/perfil/<% if (isWishlisted) { %>remove-to-wishlist<% } else { %>add-to-wishlist<% } %>" method="POST">
+                            <input type="hidden" name="idEvento" value="<%= evento._id %>">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn-wishlist">
+                                <% if (isWishlisted) { %>
+                                    <%- include('../../svgs/btnWishlisted.ejs') %>    
+                                <% } else { %>
+                                    <%- include('../../svgs/btnEmptyWishlist.ejs') %>
+                                <% } %>                                 
+                            </button>
+                        </form>
+                    </div>
+                <% } %> 
+            </div>
+
+            <p><%= evento.descripcion %></p>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-5 pdp-right">
+            <div class="border-0 mb-3 bg-white shadow-sm">
+                <div class="pb-3">
+                    <div class="p-3">
+                        <h5 class="mb-4 text-dark text-capitalize">
+                            <b><%= evento.nombre %></b>
+                        </h5>
+                        <div>
+                            <div class="row mb-3">
+                                <div class="col-3"> <div class="text-dark">Fecha</div> </div>
+                                <div class="col"> <div><%= fechaFormateada %></div> </div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-3"> <div class="text-dark">Hora</div> </div>
+                                <div class="col"> <div><%= evento.hora %></div> </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3"><h5 class="mb-0"><b class="text-dark">Entradas</b></h5></div>
+                </div>
+                
+                <form action="/tienda/realizar-compra" method="POST">
+                    <input type="hidden" value="<%= evento._id %>" name="idEvento">
+                    
+                    <% if (evento.catalogoEntradas.length > 0) { %>
+                        <% for (let entrada of evento.catalogoEntradas) { %>
+                            <%- include('../../includes/entradas-eventos', {entrada: entrada}) %>
+                        <% } %>
+
+                        <% if (!autenticado) { %>
+                            <h6>Necesita iniciar sesión para poder comprar entradas. </h6>
+                        <% } else { %>
+                            <% if (isAdmiUser) { %>
+                                <h6>Los administradores no pueden comprar entradas. </h6>
+                            <% } else { %>
+                                <input type="hidden" value="<%= usuario._id %>" name="idUser">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button class="btn btn-danger">Comprar</button>
+                            <% } %> 
+                        <% } %> 
+                        
+                    <% } else { %>
+                        <h4 class="p-3">No hay entradas registradas</h4>
+                    <% } %>                    
+                </form>                
+            </div>     
+        </div>
+    </main>
+</body>
+</html>

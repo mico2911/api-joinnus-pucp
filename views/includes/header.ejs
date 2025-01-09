@@ -1,0 +1,15 @@
+<header class="header-profile">
+    <a class="logo-joinnus" href="/tienda">
+        <%- include('../svgs/logoJoinnus.ejs') %>
+    </a>
+
+    <div class="logout">
+        <form action="/salir" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-danger" type="submit">
+                <%- include('../svgs/btnLogout.ejs') %>
+                Cerrar sesión                
+            </button>
+        </form>
+    </div>
+</header>

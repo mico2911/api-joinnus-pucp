@@ -1,0 +1,49 @@
+<%- include('../includes/head.ejs') %>
+    <link rel="stylesheet" href="/css/auth/auth.css">
+</head>
+<body class="joinnus-body">
+    <main>
+        <div class="row justify-content-center" style="min-height: calc(100vh);">
+            <div class="col-lg-6">                
+                <div class="w-100 p-4">
+                    <a href="/tienda">
+                        <img src="https://cdn.joinnus.com/files/joinnus-com-logo.svg" alt="" srcset="" width="200">
+                    </a>
+
+                    <div class="my-4"><a href="/tienda" class="mb-4"><b>Volver al Inicio</b></a></div>
+
+                    <div class="h2 mb-3"><b>Bienvenido a Joinnus</b></div>
+
+                    <% if (mensajeError) { %>
+                        <div class="user-message user-message-error w-100 my-3"><%= mensajeError %></div>
+                    <% } %>
+
+                    <form class="auth-form" action="/ingresar"  method="POST">
+
+                        <div class="form-row">
+                            <div class="col-12">
+                                <input type="text" name="correo" id="correo" placeholder="Correo electrónico">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-12">
+                                <input type="password" name="password" id="password" placeholder="Contraseña">
+                            </div>
+                        </div>
+
+                        <a href="/reinicio" style="text-align: end;">¿Olvidaste tu contraseña?</a>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-auth" type="submit">Ingresar</button>
+                        <div class="d-flex justify-content-between">
+                            <label>¿No tienes cuenta?</label>
+                            <a href="/registrarse">Registrate aquí</a>
+                        </div>                        
+                    </form>
+                </div>                
+            </div>
+            <div class="col-lg-6 auth-image"></div>
+        </div>
+    </main>
+</body>
+</html>
