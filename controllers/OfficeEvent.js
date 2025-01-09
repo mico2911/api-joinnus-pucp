@@ -30,7 +30,7 @@ exports.getListaEventos = async (req, res, next) => {
         res.status(200).json({
             eventos       : eventosFormateados,
             citiesOptions : ciudades
-        });        
+        });
     })
     .catch(err => {
         if (!err.statusCode) {
@@ -75,7 +75,7 @@ exports.postCrearEvento = (req, res, next) => {
     .then(result => {
         console.log('Evento Creado');
         console.log(result);
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se registró el evento exitosamente.'
         }); 
     })
@@ -122,7 +122,7 @@ exports.postEditarEvento = (req, res, next) => {
     .then(result => {
         console.log('Evento actualizado');
         console.log(result);
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se actualizó el evento exitosamente.'
         }); 
     })
@@ -149,7 +149,7 @@ exports.postEliminarEvento = (req, res, next) => {
     Evento.findByIdAndDelete(idEvento)
     .then(() => {
         console.log('Evento eliminado');
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se eliminó el evento exitosamente.'
         }); 
     })
@@ -187,7 +187,7 @@ exports.getDetalleEvento = async (req, res, next) => {
             throw error;
         }
 
-        res.status(200).json({            
+        res.status(200).json({
             evento : evento
         });
     })
@@ -221,7 +221,7 @@ exports.postCrearEntrada = (req, res, next) => {
     .then(result => {
         console.log(result);
         console.log('Entrada creada');
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se creó la entrada para un evento exitosamente.'
         });        
     })
@@ -234,6 +234,15 @@ exports.postCrearEntrada = (req, res, next) => {
 };
 
 exports.postEditarEntrada = async (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const idEvento  = req.body.idEvento;
     const idEntrada = req.body.idEntrada;
     const precio    = req.body.precio
@@ -246,7 +255,7 @@ exports.postEditarEntrada = async (req, res, next) => {
     .then(result => {
         console.log(result);
         console.log('Entrada actualizada');
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se modificó la entrada para un evento exitosamente.'
         });        
     })
@@ -259,6 +268,15 @@ exports.postEditarEntrada = async (req, res, next) => {
 };
 
 exports.postEliminarEntrada = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const idEvento  = req.body.idEvento;
     const idEntrada = req.body.idEntrada;
 
@@ -269,7 +287,7 @@ exports.postEliminarEntrada = (req, res, next) => {
     .then(result => {
         console.log(result);
         console.log('Entrada eliminada');
-        res.status(200).json({            
+        res.status(200).json({
             mensaje : 'Se eliminó la entrada para un evento exitosamente.'
         });        
     })
