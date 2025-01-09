@@ -13,7 +13,6 @@ router.post('/ingresar', [
 
 router.post('/salir', loginController.postSalir);
 
-router.get('/registrarse', accountController.getRegistrarse);
 router.post('/registrarse', [
     body('nombre').notEmpty().withMessage('Nombre es obligatorio'),
     body('apellido').notEmpty().withMessage('Apellido es obligatorio'),

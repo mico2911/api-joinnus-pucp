@@ -4,25 +4,6 @@ const Compra  = require('../models/compra');
 const bcrypt = require('bcryptjs');
 const {validationResult} = require('express-validator');
 
-exports.getRegistrarse = (req, res, next) => {
-    const citiesOptions = eventsHelper.getCitiesOptions();
-
-    let mensaje = req.flash('error');
-    if (mensaje.length > 0) {
-      mensaje = mensaje[0];
-    } else {
-      mensaje = null;
-    }
-    res.render('auth/registrarse', {
-        path          : '/registrarse',
-        titulo        : 'Registrarse',
-        citiesOptions : citiesOptions,
-        editingEvent  : false,
-        autenticado   : false,
-        mensajeError  : mensaje
-    });
-};
-
 exports.postRegistrarse = (req, res, next) => {
     const nombre             = req.body.nombre;
     const apellido           = req.body.apellido;
@@ -35,21 +16,15 @@ exports.postRegistrarse = (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        const citiesOptions = eventsHelper.getCitiesOptions();
-
-        return res.status(422).render('auth/registrarse', {
-            path          : '/registrarse',
-            titulo        : 'Registrarse',
-            citiesOptions : citiesOptions,
-            editingEvent  : false,
-            autenticado   : false,
-            mensajeError  : errors.array()[0].msg
-        })
+        const error = new Error(errors.array()[0].msg);
+        error.statusCode = 422;
+        throw error;
     }
     
     if (correo !== correoConfirmado) {
-        req.flash('error', 'Los correos no coinciden.')
-        res.redirect('/registrarse');
+        const error = new Error('Los correos ingresados no coinciden.');
+        error.statusCode = 422;
+        throw error;
     }
 
     bcrypt.hash(password, 10)
@@ -66,13 +41,17 @@ exports.postRegistrarse = (req, res, next) => {
         return usuario.save();
     })
     .then(result => {
-        res.redirect('/ingresar');
+        console.log(result);
+        console.log('Usuario registrado');
+        res.status(200).json({
+            mensaje   : 'Usuario registrado con éxito'
+        })
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
