@@ -1,49 +1,40 @@
 const Categoria = require('../models/categoria');
 
-exports.getMenuPrincipal = (req, res) => {
-    res.render('backoffice/menu-principal', { 
-        titulo: 'Modulo de administrador', 
-        path: "/"
-    })
-};
-
 exports.getListaCategorias = async (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
+    var isAdmiUser = req.isAdmin;
 
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
+    // Si no es un usuario administrador
     if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
     }
     
     Categoria
     .find()
     .then(categorias => {
-        res.render('backoffice/categories/listar-categorias', { 
-            titulo        : 'Categorías', 
-            tituloSeccion : 'Gestión de categorías',
-            opcion        : 'categorias',
-            categorias    : categorias
-        })
+        res.status(200).json({
+            categorias : categorias
+        });
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
 exports.postCrearCategoria = async (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const nombre = req.body.nombreCategoria;
 
     const categoria = new Categoria({
@@ -52,27 +43,42 @@ exports.postCrearCategoria = async (req, res, next) => {
 
     categoria.save()
     .then(result => {
+        console.log(result);
         console.log('Categoría creada');
-        res.redirect('categorias');
-      })
+        res.status(200).json({
+            mensaje : 'Se creó la categoría exitosamente.'
+        });        
+    })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
 exports.postEliminarCategoria = async (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const idCategoria = req.body.idCategoria;
     Categoria.findByIdAndDelete(idCategoria)
-    .then(() => {
-        res.redirect('categorias');
-      })
+    .then(() => {        
+        console.log('Categoría eliminada');
+        res.status(200).json({
+            mensaje : 'Se eliminó la categoría exitosamente.'
+        });
+    })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
