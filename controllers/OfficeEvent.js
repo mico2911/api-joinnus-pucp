@@ -5,24 +5,16 @@ const TipoEntrada  = require('../models/tipoEntrada');
 const Categoria    = require('../models/categoria');
 
 exports.getListaEventos = async (req, res, next) => {
-    const ciudades = eventsHelper.getCitiesOptions();
+    var isAdmiUser = req.isAdmin;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
-
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
+    // Si no es un usuario administrador
     if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
     }
+
+    const ciudades = eventsHelper.getCitiesOptions();
 
     Evento
     .find().populate('categoria')
@@ -35,68 +27,32 @@ exports.getListaEventos = async (req, res, next) => {
             };
         });
 
-        res.render('backoffice/events/listar-eventos', {
+        res.status(200).json({
             eventos       : eventosFormateados,
-            citiesOptions : ciudades,
-            titulo        : "Administracion de eventos", 
-            tituloSeccion : 'Listado de eventos',
-            opcion        : 'listadoEventos'
-        });
+            citiesOptions : ciudades
+        });        
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
-};
-
-exports.getCrearEvento = (req, res, next) => {
-    const horariosForm = eventsHelper.getHoursOptions();
-    const ciudades = eventsHelper.getCitiesOptions();
-
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
-
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
-    if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
-    }
-
-    Categoria
-    .find()
-    .then(categorias => {
-        res.render('backoffice/events/detalle-evento', { 
-            titulo        : 'Creación Evento', 
-            tituloSeccion : 'Creación de eventos',
-            opcion        : 'creacionEvento',
-            categorias    : categorias,
-            citiesOptions : ciudades,
-            horariosForm  : horariosForm,
-            modoEdicion   : false
-        })
-    })
-    .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
 exports.postCrearEvento = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const nombre       = req.body.nombre;
     const urlImagen    = req.body.urlImagen;
-    const idCategoria = req.body.idCategoria;
+    const idCategoria  = req.body.idCategoria;
     const descripcion  = req.body.descripcion;
     const fecha        = req.body.fecha;
     const hora         = req.body.hora;
@@ -115,77 +71,32 @@ exports.postCrearEvento = (req, res, next) => {
     });
 
     evento
-      .save()
-      .then(result => {
+    .save()
+    .then(result => {
         console.log('Evento Creado');
-        res.redirect('/backoffice/listado-eventos');
-      })
-      .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        console.log(result);
+        res.status(200).json({            
+            mensaje : 'Se registró el evento exitosamente.'
+        }); 
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
-exports.getEditarEvento = (req, res, next) => {
-    const idEvento = req.params.idEvento;
-    const horariosForm = eventsHelper.getHoursOptions();
-    const ciudades = eventsHelper.getCitiesOptions();
-
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
-
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
-    if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
-    }
-
-    Categoria
-    .find()
-    .then(categorias => {
-        Evento.findById(idEvento)
-        .then(evento => {
-            if (!evento) {
-                return res.redirect('/backoffice/listado-eventos');
-            }
-
-            res.render('backoffice/events/detalle-evento', { 
-                titulo        : 'Editar Producto',             
-                tituloSeccion : 'Edición de eventos',
-                opcion        : 'listadoEventos',
-                categorias    : categorias,
-                horariosForm  : horariosForm,
-                citiesOptions : ciudades,
-                evento        : evento,
-                fechaEvento   : format(evento.fecha, 'yyyy-MM-dd'),
-                categoriaSeleccionada : evento.categoria, 
-                modoEdicion   : true,
-            })
-        })
-        .catch(err => {
-            console.log(err);
-            return res.redirect('/backoffice/listado-eventos');
-        });
-    })
-    .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
-}
-
 exports.postEditarEvento = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const idEvento     = req.body.idEvento;
     const nombre       = req.body.nombre;
     const urlImagen    = req.body.urlImagen;
@@ -198,153 +109,69 @@ exports.postEditarEvento = (req, res, next) => {
 
     Evento.findById(idEvento)
     .then(producto => {
-      producto.nombre      = nombre;
-      producto.urlImagen   = urlImagen;
-      producto.categoria   = categoria;
-      producto.descripcion = descripcion;
-      producto.fecha       = fecha;
-      producto.hora        = hora;
-      producto.lugar       = lugar;
-      producto.ciudad      = ciudad;
-      return producto.save();
+        producto.nombre      = nombre;
+        producto.urlImagen   = urlImagen;
+        producto.categoria   = categoria;
+        producto.descripcion = descripcion;
+        producto.fecha       = fecha;
+        producto.hora        = hora;
+        producto.lugar       = lugar;
+        producto.ciudad      = ciudad;
+        return producto.save();
     })
     .then(result => {
-      res.redirect('/backoffice/listado-eventos');
+        console.log('Evento actualizado');
+        console.log(result);
+        res.status(200).json({            
+            mensaje : 'Se actualizó el evento exitosamente.'
+        }); 
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
 exports.postEliminarEvento = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
     const idEvento = req.body.idEvento;
+
     Evento.findByIdAndDelete(idEvento)
-      .then(() => {
-        res.redirect('/backoffice/listado-eventos');
-      })
-      .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-      });
-}; 
-
-exports.getListaEntradasEventos = async (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
-
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
-    if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
-    }
-
-    Evento
-    .find()
-    .then(eventos => {
-        res.render('backoffice/entradas/listar-entradas-eventos', {
-            eventos       : eventos,
-            titulo        : "Administracion de entradas de eventos", 
-            tituloSeccion : 'Listado de entradas de eventos',
-            opcion        : 'entradas'
-        });
+    .then(() => {
+        console.log('Evento eliminado');
+        res.status(200).json({            
+            mensaje : 'Se eliminó el evento exitosamente.'
+        }); 
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
-exports.getCrearEntradasEventos = async (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
+exports.getDetalleEvento = async (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
 
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
+    // Si no es un usuario administrador
     if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
     }
 
-    Evento
-    .find()
-    .then(eventos => {
-        TipoEntrada.find()
-        .then(tiposEntradas => {
-            res.render('backoffice/entradas/crear-entrada-evento', {
-                eventos       : eventos,
-                tiposEntradas : tiposEntradas,
-                titulo        : "Creación entradas", 
-                tituloSeccion : 'Creación de entradas para eventos',
-                opcion        : 'creacionEntrada'
-            });
-        })
-        .catch(err => console.log(err));        
-    })
-    .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
-};
-
-exports.postCrearEntrada = (req, res, next) => {
-    const idEvento      = req.body.idEvento;
-    const idTipoEntrada = req.body.idTipoEntrada;
-    const precio        = req.body.precio
-    const cantidad      = req.body.cantidad;
-
-    Evento.findById(idEvento)
-      .then(evento => {
-        return evento.agregarEntrada(idTipoEntrada, precio, cantidad);
-      })
-      .then(result => {
-        console.log(result);
-        res.redirect('/backoffice/listado-entradas-eventos');
-      });
-};
-
-exports.getEditarEntradasEventos = async (req, res, next) => {
     const idEvento = req.params.idEvento;
-
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-    var isAdmiUser  = false;
-
-    if (autenticado) {
-        dataUser   = req.session.usuario;
-        isAdmiUser = dataUser.isAdmin;
-    }
-
-    // Si no es un usuario administrador, renderizará 404
-    if (!isAdmiUser) {
-        return res.status(404).render('404', {
-            titulo: 'Pagina No Encontrada', 
-            path: ''
-        });
-    }
     
     Evento.findById(idEvento).populate({
         path: 'catalogoEntradas',
@@ -355,19 +182,54 @@ exports.getEditarEntradasEventos = async (req, res, next) => {
     })
     .then(evento => {
         if (!evento) {
-            return res.redirect('/backoffice/listado-entradas-eventos');
+            const error = new Error('No se ha encontrado un evento con el id especificado.');
+            error.statusCode = 404;
+            throw error;
         }
 
-        res.render('backoffice/entradas/detalle-entradas-evento', { 
-            titulo        : 'Entradas para evento',             
-            tituloSeccion : 'Entradas para: ' + evento.nombre,
-            opcion        : 'entradas',
-            evento        : evento            
-        })
+        res.status(200).json({            
+            evento : evento
+        });
     })
     .catch(err => {
-        console.log(err);
-        return res.redirect('/backoffice/listado-entradas-eventos');
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    });
+};
+
+exports.postCrearEntrada = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+
+    // Si no es un usuario administrador
+    if (!isAdmiUser) {
+        const error = new Error('No tiene los permisos necesarios para esta función.');
+        error.statusCode = 401; //Unauthorized
+        return next(error);
+    }
+
+    const idEvento      = req.body.idEvento;
+    const idTipoEntrada = req.body.idTipoEntrada;
+    const precio        = req.body.precio;
+    const cantidad      = req.body.cantidad;
+
+    Evento.findById(idEvento)
+    .then(evento => {
+        return evento.agregarEntrada(idTipoEntrada, precio, cantidad);
+    })
+    .then(result => {
+        console.log(result);
+        console.log('Entrada creada');
+        res.status(200).json({            
+            mensaje : 'Se creó la entrada para un evento exitosamente.'
+        });        
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
@@ -382,13 +244,17 @@ exports.postEditarEntrada = async (req, res, next) => {
         return evento.modificarEntrada(idEntrada, precio, cantidad);
     })
     .then(result => {
-        res.redirect('/backoffice/listado-entradas-eventos');
+        console.log(result);
+        console.log('Entrada actualizada');
+        res.status(200).json({            
+            mensaje : 'Se modificó la entrada para un evento exitosamente.'
+        });        
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
@@ -401,12 +267,16 @@ exports.postEliminarEntrada = (req, res, next) => {
         return evento.eliminarEntrada(idEntrada);
     })
     .then(result => {
-        res.redirect('/backoffice/listado-entradas-eventos');
+        console.log(result);
+        console.log('Entrada eliminada');
+        res.status(200).json({            
+            mensaje : 'Se eliminó la entrada para un evento exitosamente.'
+        });        
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 }; 
