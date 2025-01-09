@@ -1,22 +1,10 @@
-const Usuario = require('../models/usuario')
+const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const jwt    = require('jsonwebtoken');
 const {validationResult} = require('express-validator');
 
-exports.getIngresar = (req, res, next) => {
-    let mensaje = req.flash('error');
-    if (mensaje.length > 0) {
-      mensaje = mensaje[0];
-    } else {
-      mensaje = null;
-    }
-    res.render('auth/ingresar', {
-      path: '/ingresar',
-      titulo: 'Ingresar',
-      autenticado: false,
-      mensajeError: mensaje
-    });
-};
+const CIFRADO_LLAVE = 'llavedecifradolacualessecreta';
 
 exports.postIngresar = (req, res, next) => {
     const correo = req.body.correo;
@@ -25,64 +13,59 @@ exports.postIngresar = (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(422).render('auth/ingresar', {
-            ath: '/ingresar',
-            titulo: 'Ingresar',
-            autenticado: false,
-            mensajeError  : errors.array()[0].msg
-        })
+        const error = new Error(errors.array()[0].msg);
+        error.statusCode = 422; //Unprocesable content
+        throw error;
     }
 
     Usuario.findOne({ correo: correo })
     .then(usuario => {
-      if (!usuario) {
-        req.flash('error', 'El correo no está registrado')
-        return res.redirect('/ingresar');
-      }
-      bcrypt.compare(password, usuario.password)
+        if (!usuario) {
+            const error = new Error('No se encontró un usuario con el correo especificado.');
+            error.statusCode = 404; //Not Found
+            throw error;
+        }
+        bcrypt.compare(password, usuario.password)
         .then(hayCoincidencia => {
-          if(hayCoincidencia) {
-            req.session.autenticado = true;
-            req.session.usuario = usuario;
-            return req.session.save(err => {
-              console.log(err);
-              if (usuario.isAdmin) {
-                res.redirect('/backoffice/listado-eventos')
-              } else {
-                res.redirect('/tienda')
-              }              
+            if (!hayCoincidencia) {
+                const error = new Error('Las credenciales ingresadas son inválidas.');
+                error.statusCode = 401; //Unauthorized
+                throw error;
+            }
+
+            const userData = {
+                correo    : usuario.correo,
+                idUsuario : usuario._id.toString(),
+                isAdmin   : usuario.isAdmin
+            }
+
+            const token = jwt.sign(userData, CIFRADO_LLAVE, {expiresIn : '2h'});
+
+            res.status(200).json({
+                mensaje   : 'Token generado con éxito',
+                token     : token,
+                idUsuario : usuario._id.toString()
             })
-          }
-          req.flash('error', 'Las credenciales son invalidas')
-          res.redirect('/ingresar');
         })
         .catch(err => {
-          console.log(err);
-          const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    });
 };
 
 exports.postSalir = (req, res, next) => {
   req.session.destroy(err => {
     console.log(err);
     res.redirect('/tienda');
-  });
-};
-
-exports.getReinicio = (req, res, next) => {
-  let mensaje = req.flash('error');
-  if (mensaje.length > 0) {
-    mensaje = mensaje[0];
-  } else {
-    mensaje = null;
-  }
-  res.render('auth/reinicio', {
-    path: '/reinicio',
-    titulo: 'Reinicio Password',
-    mensajeError: mensaje
   });
 };
 
@@ -119,30 +102,6 @@ exports.postReinicio = (req, res, next) => {
         console.log(err);
       });
   });
-};
-
-exports.getNuevoPassword = (req, res, next) => {
-  const token = req.params.token;
-  Usuario.findOne({ tokenReinicio: token, expiracionTokenReinicio: { $gt: Date.now() } })
-    .then(usuario => {
-      let mensaje = req.flash('error');
-      if (mensaje.length > 0) {
-        mensaje = mensaje[0];
-      } else {
-        mensaje = null;
-      }
-      res.render('auth/reinicio-password', {
-        path: '/reinicio-password',
-        titulo: 'Nueva Contraseña',
-        mensajeError: mensaje,
-        nombreUsuario: usuario.nombre,
-        idUsuario: usuario._id.toString(),
-        tokenPassword: token
-      });
-    })
-    .catch(err => {
-      console.log(err);
-    });
 };
 
 exports.postNuevoPassword = (req, res, next) => {
