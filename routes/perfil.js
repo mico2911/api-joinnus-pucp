@@ -6,9 +6,7 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const {body} = require('express-validator');
 
-router.get('/', isAuth, accountController.getMiPerfil);
-router.get('/seguridad', isAuth, accountController.getSeguridadPage);
-router.get('/wishlist', isAuth, accountController.getWishlistPage);
+router.get('/users/:idUser', isAuth, accountController.getUser);
 
 router.post('/add-to-wishlist', isAuth, accountController.postAgregarWishlist);
 router.post('/remove-to-wishlist', isAuth, accountController.postRemoveWishlist);
@@ -31,13 +29,12 @@ router.post('/cambiar-password', [
                         throw new Error('La contraseña actual ingresada es incorrecta.');
                     }
                     return true;
-                })             
+                })
             }
         });
     })
 ], accountController.postCambiarPassword);
 
 router.get('/mis-entradas', isAuth, accountController.getMisEntradas);
-router.get('/historialEventos', isAuth, accountController.getHistorialCompras);
 
 module.exports = router;

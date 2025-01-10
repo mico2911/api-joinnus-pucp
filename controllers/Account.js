@@ -32,7 +32,7 @@ exports.postRegistrarse = (req, res, next) => {
         const usuario = new Usuario({
             nombre   : nombre,
             apellido : apellido,
-            correo   : correo,                
+            correo   : correo,
             password : passwordCifrado,
             genero   : genero,
             ciudad   : ciudad
@@ -55,184 +55,128 @@ exports.postRegistrarse = (req, res, next) => {
     });
 };
 
-exports.getMiPerfil = (req, res, next) => {
-    const citiesOptions = eventsHelper.getCitiesOptions();
+exports.getUser = (req, res, next) => {
+    var isAdmiUser = req.isAdmin;
+    var idUsuario  = req.idUsuario;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
+    const idUserParam = req.params.idUser;
 
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
+    // Si es un usuario administrador o si es el mismo usuario loggeado
+    if (isAdmiUser || idUsuario === idUserParam) {
+        Usuario.findById(idUserParam)
+        .then(usuario => {
+            if (!usuario) {
+                const error = new Error('No se ha encontrado un usuario con el id especificado.');
+                error.statusCode = 404;
+                throw error;
+            }
 
-    Usuario.findById(dataUser._id)
-    .then(usuario => {
-        return res.render('tienda/profile/mi-perfil', {
-            titulo        : 'Mi Perfil',
-            tituloSeccion : 'Información de mi cuenta',
-            opcion        : 'infoPersonal',
-            autenticado   : req.session.autenticado,
-            citiesOptions : citiesOptions,
-            editingEvent  : false,
-            usuario       : usuario,
-            tieneFoto     : usuario.urlFoto
+            res.status(200).json({
+                usuario : usuario
+            });
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
-    })
-    .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
+    } else {
+        const error = new Error('No se ha podido encontrar el usuario solicitado');
+        error.statusCode = 401; //Unauthorized
         return next(error);
-    });
-};
-
-exports.getSeguridadPage = (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser    = req.session.usuario;
     }
-
-    Usuario.findById(dataUser._id)
-    .then(usuario => {
-        return res.render('tienda/profile/seguridad-page', {
-            titulo        : 'Mi Perfil',
-            tituloSeccion : 'Seguridad y contraseña',
-            opcion        : 'seguridad',
-            mensajeError  : '',
-            autenticado   : req.session.autenticado,
-            usuario       : usuario,
-            tieneFoto     : usuario.urlFoto
-        });
-    })
-    .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
-    });
-};
-
-exports.getWishlistPage = (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
-
-    Usuario.findById(dataUser._id)
-    .populate('eventosFavoritos', 'nombre urlImagen')
-    .then(usuario => {
-
-        var eventosFavoritos    = [];
-        var hayEventosFavoritos = false;
-
-
-        if (usuario.eventosFavoritos && usuario.eventosFavoritos.length > 0) {
-            eventosFavoritos    = usuario.eventosFavoritos;
-            hayEventosFavoritos = true;
-        }                    
-
-        return res.render('tienda/profile/wishlist-page', {
-            titulo        : 'Mi Perfil',
-            tituloSeccion : 'Eventos favoritos',
-            opcion        : 'wishlist',
-            autenticado   : req.session.autenticado,
-            usuario       : usuario,
-            tieneFoto     : usuario.urlFoto,
-            hayEventosFavoritos : hayEventosFavoritos,
-            eventosFavoritos    : eventosFavoritos
-        });
-    })
 };
 
 exports.postAgregarWishlist = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const idEvento = req.body.idEvento;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
             return usuario.agregarEventoWishlist(idEvento);
         })
         .then(result => {
             console.log(result);
-            res.redirect('/tienda/detalle-evento/' + idEvento);
+            console.log('Evento añadido a la lista de favoritos exitosamente');
+            res.status(200).json({
+                mensaje : 'Evento añadido a la lista de favoritos exitosamente'
+            });
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
-    }    
+    }
 };
 
 
 exports.postRemoveWishlist = (req, res, next) => {
-    const idEvento      = req.body.idEvento;
-    const isFromProfile = req.body.isFromProfile;
+    var idUsuario  = req.idUsuario;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
+    const idEvento = req.body.idEvento;
 
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
             return usuario.eliminarEventoWishlist(idEvento);
         })
         .then(result => {
             console.log(result);
-            if (isFromProfile) {
-                res.redirect('/perfil/wishlist/');
-            } else {
-                res.redirect('/tienda/detalle-evento/' + idEvento);
-            }            
+            console.log('Evento eliminado de la lista de favoritos exitosamente');
+            res.status(200).json({
+                mensaje : 'Evento eliminado de la lista de favoritos exitosamente'
+            });
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }    
 };
 
 exports.postAgregarFoto = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const foto  = req.body.foto;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
-        .then(usuario => {            
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
+        .then(usuario => {
             usuario.urlFoto = foto;
             return usuario.save();
         })
-        .then(result => {          
-            res.redirect('/perfil');
+        .then(result => {
+            console.log(result);
+            res.status(200).json({
+                mensaje : 'Foto añadida al usuario exitosamente.'
+            });
         })
         .catch(err => {
-              console.log(err);
-              const error = new Error(err);
-              error.httpStatusCode = 500;
-              return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }    
 };
 
 exports.postEditarInfoPersonal = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const nombre   = req.body.nombre;
     const apellido = req.body.apellido;
     const genero   = req.body.genero;
     const ciudad   = req.body.ciudad;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
             if (nombre) {
                 usuario.nombre = nombre;
@@ -252,63 +196,63 @@ exports.postEditarInfoPersonal = (req, res, next) => {
             
             return usuario.save();
         })
-        .then(result => {          
-            res.redirect('/perfil');
+        .then(result => {
+            console.log(result);
+            res.status(200).json({
+                mensaje : 'Información personal actualizada exitosamente.'
+            });
         })
         .catch(err => {
-              console.log(err);
-              const error = new Error(err);
-              error.httpStatusCode = 500;
-              return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }    
 };
 
 exports.postEditarInformacionComplementaria = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const dni = req.body.dni;
-    const fechaNacimiento = req.body.fechaNacimiento;    
+    const fechaNacimiento = req.body.fechaNacimiento;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
             if (dni) {
                 usuario.dni = dni;
             }
 
-            if (fechaNacimiento) {                
+            if (fechaNacimiento) {
                 usuario.fechaNacimiento = fechaNacimiento.toString();
             }
             
             return usuario.save();
         })
         .then(result => {
-            res.redirect('/perfil');
+            console.log(result);
+            res.status(200).json({
+                mensaje : 'Información complementaria actualizada exitosamente.'
+            });
         })
         .catch(err => {
-              console.log(err);
-              const error = new Error(err);
-              error.httpStatusCode = 500;
-              return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }    
 };
 
 exports.postEditarInformacionContacto = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const correo  = req.body.correo;
     const celular = req.body.celular;
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
             if (correo) {
                 usuario.correo = correo;
@@ -320,75 +264,65 @@ exports.postEditarInformacionContacto = (req, res, next) => {
             
             return usuario.save();
         })
-        .then(result => {            
-            res.redirect('/perfil');
+        .then(result => {
+            console.log(result);
+            res.status(200).json({
+                mensaje : 'Información de contacto actualizada exitosamente.'
+            });
         })
         .catch(err => {
-              console.log(err);
-              const error = new Error(err);
-              error.httpStatusCode = 500;
-              return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }    
 };
 
 exports.postCambiarPassword = (req, res, next) => {
+    var idUsuario  = req.idUsuario;
+
     const nueva  = req.body.nueva;
+    const errors = validationResult(req);
 
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    const errors = validationResult(req);    
-
-    if (autenticado) {
-        dataUser = req.session.usuario;
-
-        Usuario.findById(dataUser._id)
+    if (idUsuario) {
+        Usuario.findById(idUsuario)
         .then(usuario => {
 
             if (!errors.isEmpty()) {
-
-                return res.status(422).render('tienda/profile/seguridad-page', {
-                    titulo        : 'Mi Perfil',
-                    tituloSeccion : 'Seguridad y contraseña',
-                    opcion        : 'seguridad',
-                    mensajeError  : errors.array()[0].msg,
-                    autenticado   : req.session.autenticado,
-                    usuario       : usuario,
-                    tieneFoto     : usuario.urlFoto
-                });
+                const error = new Error(errors.array()[0].msg);
+                error.statusCode = 422;
+                throw error;
             }
 
             bcrypt.hash(nueva, 10)
             .then(passwordCifrado => {
-                usuario.password = passwordCifrado;                        
+                usuario.password = passwordCifrado;
 
                 return usuario.save();
             })
             .then(result => {
-                res.redirect('/perfil/seguridad');
+                console.log(result);
+                res.status(200).json({
+                    mensaje : 'Contraseña actualizada exitosamente.'
+                });
             })
             .catch(err => {
-                console.log(err);
-                const error = new Error(err);
-                error.httpStatusCode = 500;
-                return next(error);
+                if (!err.statusCode) {
+                    err.statusCode = 500;
+                }
+                next(err);
             });
         })        
     }
 };
 
 exports.getMisEntradas = (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
+    var idUsuario  = req.idUsuario;
 
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
-
-    Usuario.findById(dataUser._id)
+    Usuario.findById(idUsuario)
     .then(usuarioEnc => {
-        Compra.find({usuario: dataUser._id})
+        Compra.find({usuario: idUsuario})
         .populate({
             path: 'entradas',
             populate: [
@@ -402,85 +336,16 @@ exports.getMisEntradas = (req, res, next) => {
                 }
             ]
         })
-        .then (compras => {        
-            var hayCompras = false;
-
-            if (compras.length > 0) {
-                hayCompras = true;
-            }
-
-            return res.render('tienda/profile/listado-compras', {
-                titulo        : 'Mi Perfil',
-                tituloSeccion : 'Mis entradas',
-                opcion        : 'misEntradas',
-                autenticado   : req.session.autenticado,
-                usuario       : usuarioEnc,
-                tieneFoto     : usuarioEnc.urlFoto,
-                hayCompras    : hayCompras,
-                soloVigentes  : true,
-                hoy           : new Date (),
-                compras       : compras
+        .then (compras => {
+            res.status(200).json({
+                compras : compras
             });
         })
         .catch(err => {
-            console.log(err);
-            const error = new Error(err);
-            error.httpStatusCode = 500;
-            return next(error);
+            if (!err.statusCode) {
+                err.statusCode = 500;
+            }
+            next(err);
         });
     }) 
-};
-
-
-exports.getHistorialCompras = (req, res, next) => {
-    var autenticado = req.session.autenticado;
-    var dataUser    = null;
-
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
-
-    Usuario.findById(dataUser._id)
-    .then(usuarioEnc => {
-        Compra.find({usuario: dataUser._id})
-        .populate({
-            path: 'entradas',
-            populate: [
-                {
-                    path: 'evento',
-                    select: 'nombre fecha hora urlImagen lugar'
-                },
-                {
-                    path: 'tipoEntrada',  // Poblamos el tipo de entrada
-                    select: 'nombre'     // Seleccionamos el nombre del tipo de entrada
-                }
-            ]
-        })
-        .then (compras => {        
-            var hayCompras = false;
-
-            if (compras.length > 0) {
-                hayCompras = true;
-            }
-
-            return res.render('tienda/profile/listado-compras', {
-                titulo        : 'Mi Perfil',
-                tituloSeccion : 'Mis entradas',
-                opcion        : 'historialEntradas',
-                autenticado   : req.session.autenticado,
-                usuario       : usuarioEnc,
-                tieneFoto     : usuarioEnc.urlFoto,
-                hayCompras    : hayCompras,
-                soloVigentes  : false,
-                hoy           : new Date (),
-                compras       : compras
-            });
-        })
-        .catch(err => {
-            console.log(err);
-            const error = new Error(err);
-            error.httpStatusCode = 500;
-            return next(error);
-        });
-    })    
 };
