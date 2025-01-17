@@ -1,6 +1,7 @@
 const express    = require('express');
 const path       = require('path');
 const bodyParser = require('body-parser');
+const cors       = require('cors');
 
 const mongoose     = require('mongoose');
 
@@ -14,6 +15,11 @@ const perfilRoutes = require('./routes/perfil');
 const errorController = require('./controllers/Error');
 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true // Permite el envío de cookies
+}));
 
 app.use(bodyParser.json());
 
