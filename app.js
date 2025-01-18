@@ -41,11 +41,13 @@ app.use((error, req, res, next) => {
 });
 
 mongoose.connect(MONGODB_URI)
-    .then(result => {
-        app.listen(3000, () => {
-            console.log('Se inició el servidor backend del proyecto JOINNUS...')
-        });
-    })
-    .catch(err => {
-        console.log(err);
+.then(result => {
+    app.listen(3000, () => {
+        console.log('Se inició el servidor backend del proyecto JOINNUS...')
     });
+})
+.catch(err => {
+    console.log(err);
+});
+
+module.exports = app;

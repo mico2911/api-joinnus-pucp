@@ -27,12 +27,12 @@ router.post('/registrarse', [
         });
     }),
     body('password', 'Password inválido. Debe tener solo letras y números y no menos de 5 caracteres').isLength({min:5}).isAlphanumeric(),
-    body('passwordConfirmado').custom((value, {req})=> {
+    /*body('passwordConfirmado').custom((value, {req})=> {
         if (value !== req.body.password) {
             throw new Error('Contraseñas no coinciden');
         }
         return true; // Para indicar que pasó la validación
-    })
+    })*/
 ], accountController.postRegistrarse);
 
 router.post('/reinicio', loginController.postReinicio);

@@ -6,6 +6,7 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcryptjs');
 const {body} = require('express-validator');
 
+router.get('/info-account', isAuth, accountController.getInfoAccount);
 router.get('/users/:idUser', isAuth, accountController.getUser);
 
 router.post('/add-to-wishlist', isAuth, accountController.postAgregarWishlist);
