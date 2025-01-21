@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const CIFRADO_LLAVE = 'llavedecifradolacualessecreta';
+require('dotenv').config();
+
+const CIFRADO_LLAVE = process.env.CIFRADO_LLAVE;
 
 module.exports = (req, res, next) => {
     const authHeader = req.get('Authorization');

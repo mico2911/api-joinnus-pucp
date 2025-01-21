@@ -4,7 +4,9 @@ const crypto = require('crypto');
 const jwt    = require('jsonwebtoken');
 const {validationResult} = require('express-validator');
 
-const CIFRADO_LLAVE = 'llavedecifradolacualessecreta';
+require('dotenv').config();
+
+const CIFRADO_LLAVE = process.env.CIFRADO_LLAVE;
 
 exports.postIngresar = (req, res, next) => {
     const correo = req.body.correo;
@@ -42,7 +44,7 @@ exports.postIngresar = (req, res, next) => {
             const token = jwt.sign(userData, CIFRADO_LLAVE, {expiresIn : '2h'});
 
             res.status(200).json({
-                mensaje   : 'Token generado con éxito',
+                mensaje   : 'Sesión iniciada con éxito',
                 token     : token,
                 idUsuario : usuario._id.toString()
             })
