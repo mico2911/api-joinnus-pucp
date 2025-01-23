@@ -32,7 +32,7 @@ app.get('/500', errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
-    console.log(error);
+    //console.log(error);
     const status = error.statusCode || 500;
     const mensaje = error.message;
     res.status(status).json({
@@ -42,9 +42,15 @@ app.use((error, req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
 .then(result => {
-    app.listen(3000, () => {
-        console.log('Se inició el servidor backend del proyecto JOINNUS...')
-    });
+    // Solo inicia el servidor si no estamos en el entorno de pruebas
+    if (process.env.MODE_EXECT !== 'test') {
+
+        const PORT = process.env.PORT || 3000;
+
+        app.listen(PORT, () => {
+            console.log(`Servidor backend del proyecto JOINNUS iniciado en el puerto ${PORT}`);
+        });
+    }
 })
 .catch(err => {
     console.log(err);
