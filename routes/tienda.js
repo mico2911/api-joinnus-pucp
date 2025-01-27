@@ -6,7 +6,7 @@ const homeController = require ('../controllers/Home');
 const storeEventController = require('../controllers/StoreEvent');
 const purchaseController = require('../controllers/Purchase');
 
-router.get ('/', homeController.getIndex);
+router.get ('/home-events', homeController.getHomeEvents);
 router.get('/eventos/:idEvento', storeEventController.getDetalleEventoTienda);
 
 router.post('/realizar-compra', isAuth, purchaseController.postRealizarCompra);
