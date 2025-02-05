@@ -87,9 +87,23 @@ exports.verifyToken = (req, res, next) => {
         throw error;
     }
 
-    return res.json({
-        id      : decodedToken.idUsuario,
-        isAdmin : decodedToken.isAdmin,
+    Usuario.findById(decodedToken.idUsuario)
+    .then(usuario => {
+        if (!usuario) {
+            const error = new Error('No se ha encontrado un usuario con el id especificado.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        res.status(200).json({
+            user : usuario
+        });
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 

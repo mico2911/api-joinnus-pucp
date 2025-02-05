@@ -13,6 +13,6 @@ router.post('/realizar-compra', isAuth, purchaseController.postRealizarCompra);
 router.get('/detalle-compra/:idCompra', isAuth, purchaseController.getDetalleCompra);
 router.get('/entradas/:idCompra', isAuth, purchaseController.getDetalleEntradasCompra);
 
-router.get('/buscar-eventos', storeEventController.getListadoEventos);
+router.get('/buscar-eventos', storeEventController.getEventosPlp);
 
 module.exports = router;

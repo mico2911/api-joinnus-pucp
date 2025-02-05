@@ -1,14 +1,25 @@
 // Controlador para mostrar el Home
+const moment = require('moment');
+const { format } = require('date-fns');
 const Evento = require('../models/evento');
 
 exports.getHomeEvents = (req, res, next) => {
+    const today = moment().toISOString(); 
+
     Evento
-    .find()
+    .find({ fecha: { $gte: today } })
+    .limit(8)
     .then(eventos => {
-        const eventsHome = eventos.length > 8 ? eventos.slice(0, 8) : eventos;
+
+        const eventosConFechaParsed = eventos.map(evento => {
+            return {
+                ...evento.toObject(),
+                fechaParsed: format(evento.fecha, 'dd/MM/yyyy')
+            };
+        });
 
         res.status(200).json({
-            eventos : eventsHome
+            eventos : eventosConFechaParsed
         });
     })
     .catch(err => {
