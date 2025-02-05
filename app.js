@@ -3,6 +3,8 @@ const path       = require('path');
 const bodyParser = require('body-parser');
 const cors       = require('cors');
 
+const cookieParser = require('cookie-parser');
+
 const mongoose     = require('mongoose');
 
 const MONGODB_URI = 'mongodb+srv://mactperu2911:vo7OzZA73rx5LSjX@cluster0.1vyjt.mongodb.net/joinnusweb?retryWrites=true&w=majority&appName=Cluster0';
@@ -21,6 +23,7 @@ app.use(cors({
     credentials: true // Permite el envío de cookies
 }));
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use('/backoffice', backOfficeRoutes);

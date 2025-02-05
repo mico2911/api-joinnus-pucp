@@ -35,6 +35,8 @@ router.post('/registrarse', [
     })*/
 ], accountController.postRegistrarse);
 
+router.get('/verify-token', loginController.verifyToken);
+
 router.post('/reinicio', loginController.postReinicio);
 router.post('/nuevo-password', loginController.postNuevoPassword);
 

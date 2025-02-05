@@ -43,9 +43,12 @@ exports.postIngresar = (req, res, next) => {
 
             const token = jwt.sign(userData, CIFRADO_LLAVE, {expiresIn : '2h'});
 
+            res.cookie('token', token);
+
             res.status(200).json({
                 mensaje   : 'Sesión iniciada con éxito',
-                token     : token,
+                success   : true,
+                user      : usuario,
                 idUsuario : usuario._id.toString()
             })
         })
@@ -61,6 +64,32 @@ exports.postIngresar = (req, res, next) => {
             err.statusCode = 500;
         }
         next(err);
+    });
+};
+
+exports.verifyToken = (req, res, next) => {
+    const {token} = req.cookies;
+
+    if (!token) {
+        return res.status(401).json({ mensaje : 'Unauthorized' });
+    }
+
+    try {
+        decodedToken = jwt.verify(token, CIFRADO_LLAVE);
+    } catch (err) {
+        err.statusCode = 500;
+        throw err;
+    }
+
+    if (!decodedToken) {
+        const error = new Error('Autenticación fallida');
+        error.statusCode = 401; //Unauthorized
+        throw error;
+    }
+
+    return res.json({
+        id      : decodedToken.idUsuario,
+        isAdmin : decodedToken.isAdmin,
     });
 };
 

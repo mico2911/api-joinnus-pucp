@@ -44,7 +44,8 @@ exports.postRegistrarse = (req, res, next) => {
         console.log(result);
         console.log('Usuario registrado');
         res.status(200).json({
-            mensaje   : 'Usuario registrado con éxito'
+            mensaje : 'Usuario registrado con éxito',
+            success : true
         })
     })
     .catch(err => {
