@@ -179,7 +179,9 @@ exports.postAgregarFoto = (req, res, next) => {
         .then(result => {
             console.log(result);
             res.status(200).json({
-                mensaje : 'Foto añadida al usuario exitosamente.'
+                mensaje : 'Foto añadida al usuario exitosamente.',
+                user : result,
+                success : true
             });
         })
         .catch(err => {
@@ -223,7 +225,9 @@ exports.postEditarInfoPersonal = (req, res, next) => {
         .then(result => {
             console.log(result);
             res.status(200).json({
-                mensaje : 'Información personal actualizada exitosamente.'
+                mensaje : 'Información personal actualizada exitosamente.',
+                user : result,
+                success : true
             });
         })
         .catch(err => {
@@ -257,7 +261,9 @@ exports.postEditarInformacionComplementaria = (req, res, next) => {
         .then(result => {
             console.log(result);
             res.status(200).json({
-                mensaje : 'Información complementaria actualizada exitosamente.'
+                mensaje : 'Información complementaria actualizada exitosamente.',
+                user : result,
+                success : true
             });
         })
         .catch(err => {
@@ -291,7 +297,9 @@ exports.postEditarInformacionContacto = (req, res, next) => {
         .then(result => {
             console.log(result);
             res.status(200).json({
-                mensaje : 'Información de contacto actualizada exitosamente.'
+                mensaje : 'Información de contacto actualizada exitosamente.',
+                user : result,
+                success : true
             });
         })
         .catch(err => {
