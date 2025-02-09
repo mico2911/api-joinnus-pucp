@@ -4,16 +4,17 @@ exports.getListaCategorias = async (req, res, next) => {
     var isAdmiUser = req.isAdmin;
 
     // Si no es un usuario administrador
-    if (!isAdmiUser) {
+    /*if (!isAdmiUser) {
         const error = new Error('No tiene los permisos necesarios para esta función.');
         error.statusCode = 401; //Unauthorized
         return next(error);
-    }
+    }*/
     
     Categoria
     .find()
     .then(categorias => {
         res.status(200).json({
+            success    : true,
             categorias : categorias
         });
     })

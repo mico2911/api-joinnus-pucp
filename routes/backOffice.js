@@ -17,7 +17,7 @@ router.post('/evento-entradas', isAuth, officeEventController.postCrearEntrada);
 router.post('/evento-entradas-update', isAuth, officeEventController.postEditarEntrada);
 router.post('/evento-entradas-delete', isAuth, officeEventController.postEliminarEntrada);
 
-router.get('/categorias', isAuth, backOfficeController.getListaCategorias);
+router.get('/categorias', backOfficeController.getListaCategorias);
 router.post('/categorias', isAuth, backOfficeController.postCrearCategoria);
 router.post('/categorias-delete', isAuth, backOfficeController.postEliminarCategoria);
 
