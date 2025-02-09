@@ -336,7 +336,9 @@ exports.postCambiarPassword = (req, res, next) => {
             .then(result => {
                 console.log(result);
                 res.status(200).json({
-                    mensaje : 'Contraseña actualizada exitosamente.'
+                    mensaje : 'Contraseña actualizada exitosamente.',
+                    user : result,
+                    success : true
                 });
             })
             .catch(err => {

@@ -35,11 +35,15 @@ exports.postRealizarCompra = async (req, res, next) => {
         }
     });
 
-    const entradasArray = Object.keys(entradas).map(id => ({
-        tipoEntradaId: entradas[id].tipoEntrada,
-        qtyEntrada: parseInt(entradas[id].qtyEntrada),
-        precioEntrada: parseFloat(entradas[id].precioEntrada)
-    }));
+    const entradasArray = Object.keys(entradas).map(id => {
+        if (entradas[id].qtyEntrada) {
+            return {
+                tipoEntradaId: entradas[id].tipoEntrada,
+                qtyEntrada: parseInt(entradas[id].qtyEntrada),
+                precioEntrada: parseFloat(entradas[id].precioEntrada)         
+            }
+        }
+    }).filter(item => item !== undefined);
 
     let totalCompra = 0;
     const entradasGuardadas = [];
@@ -77,8 +81,11 @@ exports.postRealizarCompra = async (req, res, next) => {
     try {
         const compraGuardada = await nuevaCompra.save();
         console.log('Compra guardada:', compraGuardada);
-        // Redirigimos al detalle de la compra
-        res.redirect(`/tienda/detalle-compra/${compraGuardada._id}`);
+        res.status(200).json({
+            mensaje : 'Compra creada exitosamente.',
+            success : true,
+            compra  : compraGuardada  
+        });
     } catch (error) {
         console.error('Error al guardar la compra:', error);
         res.status(500).json({ message: 'Error al procesar la compra' });
@@ -87,13 +94,7 @@ exports.postRealizarCompra = async (req, res, next) => {
 
 exports.getDetalleCompra = (req, res, next) => {
     const idCompra = req.params.idCompra;
-
-    var autenticado  = req.session.autenticado;
-    var dataUser     = null;
-
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
+    var idUsuario  = req.idUsuario;
 
     Compra.findById(idCompra)
     .populate({
@@ -111,45 +112,40 @@ exports.getDetalleCompra = (req, res, next) => {
     })
     .then (compra => {
         if (!compra) {
-            return res.status(404).send('Compra no encontrada');
+            return res.status(404).json({
+                mensaje: 'Recurso no encontrado',
+                success: false
+            });
         }
 
         // Si no es propietario de esa compra
-        if (!compra.usuario.equals(dataUser._id)) {
-            return res.status(404).render('404', {
-                titulo: 'Pagina No Encontrada', 
-                path: ''
+        if (!compra.usuario.equals(idUsuario)) {
+            return res.status(404).json({
+                mensaje: 'Recurso no encontrado para este usuario',
+                success: false
             });
         }
 
         const evento = compra.entradas[0].evento;
-        
-        res.render('tienda/compra/resumen-compra', {
-            titulo      : 'Detalle de compra',
-            autenticado : autenticado,
-            usuario     : dataUser,
-            idCompra    : idCompra,
-            compra      : compra,
-            evento      : evento
-        })
+
+        res.status(200).json({
+            mensaje : 'Detalle de compra obtenido exitosamente',
+            success : true,
+            compra  : compra,
+            eventoComprado : evento
+        });
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };
 
 exports.getDetalleEntradasCompra = (req, res, next) => {
     const idCompra = req.params.idCompra;
-
-    var autenticado  = req.session.autenticado;
-    var dataUser     = null;
-
-    if (autenticado) {
-        dataUser    = req.session.usuario;
-    }
+    var idUsuario  = req.idUsuario;
 
     Compra.findById(idCompra)
     .populate({
@@ -167,32 +163,33 @@ exports.getDetalleEntradasCompra = (req, res, next) => {
     })
     .then (compra => {
         if (!compra) {
-            return res.status(404).send('Compra no encontrada');
+            return res.status(404).json({
+                mensaje: 'Recurso no encontrado',
+                success: false
+            });
         }
 
         // Si no es propietario de esa compra
-        if (!compra.usuario.equals(dataUser._id)) {
-            return res.status(404).render('404', {
-                titulo: 'Pagina No Encontrada', 
-                path: ''
+        if (!compra.usuario.equals(idUsuario)) {
+            return res.status(404).json({
+                mensaje: 'Recurso no encontrado para este usuario',
+                success: false
             });
         }
 
         const evento = compra.entradas[0].evento;
-        
-        res.render('tienda/compra/detalle-entradas', {
-            titulo      : 'Detalle de compra',
-            autenticado : autenticado,
-            usuario     : dataUser,
-            idCompra    : idCompra,
-            compra      : compra,
-            evento      : evento
-        })
+
+        res.status(200).json({
+            mensaje : 'Detalle de tickets obtenido exitosamente',
+            success : true,
+            compra  : compra,
+            eventoComprado : evento
+        });
     })
     .catch(err => {
-        console.log(err);
-        const error = new Error(err);
-        error.httpStatusCode = 500;
-        return next(error);
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
     });
 };

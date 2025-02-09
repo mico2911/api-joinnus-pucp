@@ -3,6 +3,7 @@ const Evento       = require('../models/evento');
 const Usuario      = require('../models/usuario');
 const Categoria    = require('../models/categoria');
 const eventsHelper = require ('../scripts/helpers/eventsHelper');
+const moment     = require('moment');
 const { format } = require('date-fns');
 
 const ITEMS_POR_PAGINA = 8;
@@ -148,13 +149,10 @@ exports.getListadoEventos = async (req, res, next) => {
 }
 
 exports.getEventosPlp = async (req, res, next) => {
+    const today = moment().toISOString(); 
+
     const categorySelected = req.query.idCategoria;
     const citySelected = req.query.ciudad;
-    const dateStart = req.query.dateStart;
-    const dateEnd = req.query.dateEnd;
-
-    const categorias = await Categoria.find();
-    const citiesOptions = eventsHelper.getCitiesOptions();
 
     const filter = {};
 
@@ -162,17 +160,7 @@ exports.getEventosPlp = async (req, res, next) => {
 
     if (citySelected) { filter.ciudad = citySelected; }
 
-    if (dateStart || dateEnd) {
-        filter.fecha = {};
-
-        if (dateStart) {
-            filter.fecha.$gte = dateStart;
-        }
-
-        if (dateEnd) {
-            filter.fecha.$lte = dateEnd;
-        }
-    }
+    filter.fecha = { $gte: today };
 
     const pagina = +req.query.pagina || 1;
     let nroEventos;
@@ -190,7 +178,7 @@ exports.getEventosPlp = async (req, res, next) => {
             const fechaFormateada = format(evento.fecha, 'dd/MM/yyyy');
             return {
                 ...evento.toObject(),
-                fecha: fechaFormateada
+                fechaParsed: fechaFormateada
             };
         });
 
@@ -203,8 +191,6 @@ exports.getEventosPlp = async (req, res, next) => {
                 mensaje                 : 'Procesado exitosamente',
                 categoriaSeleccionada   : categorySelected,
                 ciudadSeleccionada      : citySelected,
-                fechaInicioSeleccionada : dateStart, 
-                fechaFinSeleccionada    : dateEnd,
                 paginaActual         : pagina,
                 tienePaginaSiguiente : ITEMS_POR_PAGINA * pagina < nroEventos,
                 tienePaginaAnterior  : pagina > 1,
