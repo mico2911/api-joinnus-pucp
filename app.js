@@ -19,7 +19,7 @@ const errorController = require('./controllers/Error');
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://pucp-joinnus.web.app',
     credentials: true // Permite el envío de cookies
 }));
 
