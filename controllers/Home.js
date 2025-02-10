@@ -8,7 +8,7 @@ exports.getHomeEvents = (req, res, next) => {
 
     Evento
     .find({ fecha: { $gte: today } })
-    .limit(8)
+    .limit(3)
     .then(eventos => {
 
         const eventosConFechaParsed = eventos.map(evento => {
