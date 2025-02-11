@@ -44,9 +44,7 @@ exports.postIngresar = (req, res, next) => {
             const token = jwt.sign(userData, CIFRADO_LLAVE, {expiresIn : '2h'});
 
             res.cookie('token', token, {
-              secure: true,
-              sameSite: 'None',
-              maxAge: 3600000,
+              sameSite: 'None'
             });
 
             res.status(200).json({
