@@ -43,9 +43,7 @@ exports.postIngresar = (req, res, next) => {
 
             const token = jwt.sign(userData, CIFRADO_LLAVE, {expiresIn : '2h'});
 
-            res.cookie('token', token, {
-              sameSite: 'None'
-            });
+            res.cookie('token', token);
 
             res.status(200).json({
                 mensaje   : 'Sesión iniciada con éxito',
